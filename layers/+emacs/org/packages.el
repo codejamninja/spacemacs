@@ -17,6 +17,7 @@
         evil-org
         evil-surround
         gnuplot
+        (helm-org :toggle (configuration-layer/layer-used-p 'helm))
         (helm-org-rifle :toggle (configuration-layer/layer-used-p 'helm))
         htmlize
         ;; ob, org and org-agenda are installed by `org-plus-contrib'
@@ -82,6 +83,11 @@
   (use-package helm-org-rifle
     :defer t
     :init (spacemacs/set-leader-keys "aor" 'helm-org-rifle)))
+
+(defun org/init-helm-org ()
+  (use-package helm-org
+    :commands (helm-org-in-buffer-headings)
+    :defer t))
 
 (defun org/init-htmlize ()
   (use-package htmlize
@@ -423,6 +429,14 @@ Will work on both org-mode and any mode that accepts plain html."
         ("z" recenter-top-bottom)
         ("e" org-babel-execute-maybe :exit t)
         ("'" org-edit-special :exit t)))))
+
+(defun org/post-init-org ()
+  ;; unfold the org headings for a target line
+  ;; There's a pending upstream PR:
+  ;; Use helm-goto-char to show match and reveal outlines
+  ;; https://github.com/syohex/emacs-helm-ag/pull/304
+  ;; when/if it's accepted, then this advice can be removed.
+  (advice-add 'helm-ag--find-file-action :after #'spacemacs/org-reveal-advice))
 
 (defun org/init-org-agenda ()
   (use-package org-agenda

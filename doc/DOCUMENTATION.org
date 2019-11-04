@@ -98,6 +98,8 @@
     - [[#custom-layouts][Custom Layouts]]
     - [[#saveload-layouts-into-a-file][Save/Load layouts into a file]]
     - [[#layout-key-bindings][Layout key bindings]]
+    - [[#behavior-of-spc-tab-with-layouts][Behavior of SPC TAB with layouts]]
+    - [[#restrict-a-given-function-to-the-current-layout][Restrict a given function to the current layout]]
   - [[#workspaces][Workspaces]]
     - [[#workspace-key-bindings][Workspace key bindings]]
 - [[#commands][Commands]]
@@ -206,6 +208,10 @@
 - [[#troubleshoot][Troubleshoot]]
   - [[#loading-fails][Loading fails]]
   - [[#upgradingdowngrading-emacs-version][Upgrading/Downgrading Emacs version]]
+  - [[#general-layer-errors][General layer errors]]
+    - [[#step-by-step-instructions-for-minimal-layer-bug-reports][Step by step instructions for minimal layer bug reports]]
+  - [[#general-emacs-package-errors][General emacs package errors]]
+    - [[#step-by-step-instructions-for-minimal-emacs-package-bug-reports][Step by step instructions for minimal emacs package bug reports]]
 - [[#achievements][Achievements]]
   - [[#issues][Issues]]
   - [[#merged-pull-requests][Merged Pull Requests]]
@@ -1389,7 +1395,7 @@ For =spacemacs=, =all-the-icons= and =custom= themes you can specify the type
 of separator you want with the property =:separator=.
 
 #+BEGIN_SRC emacs-lisp
-  (setq dotspacemacs-mode-line-theme '(all-the-icons :separator 'slant))
+  (setq dotspacemacs-mode-line-theme '(all-the-icons :separator slant))
 #+END_SRC
 
 Supported separators and preview:
@@ -1552,36 +1558,38 @@ Additionally all globally available toggles have a circled unicode symbols like
 =ⓟ=. Toggles specific to a major mode under the ~SPC m T~ prefix have plain
 squared symbols like =🅿=.
 
-| Key binding | Unicode | ASCII | Mode                                                                 |
-|-------------+---------+-------+----------------------------------------------------------------------|
-| ~SPC t -~   | =⊝=     | -     | [[https://www.emacswiki.org/emacs/centered-cursor-mode.el][centered-cursor]] mode                                                 |
-| ~SPC t 8~   | =⑧=     | 8     | toggle highlight of characters for long lines                        |
-| ~SPC t C-8~ | =⑧=     | 8     | global toggle highlight of characters for long lines                 |
-| ~SPC t C--~ | =⊝=     | -     | global centered cursor                                               |
-| ~SPC t a~   | =ⓐ=     | a     | auto-completion                                                      |
-| ~SPC t c~   | =ⓒ=     | c     | camel case motion with subword mode                                  |
-| =none=      | =ⓔ=     | e     | [[https://github.com/Somelauw/evil-org-mode][evil-org]] mode                                                        |
-| ~SPC t E e~ | =Ⓔe=    | Ee    | emacs editing style (holy mode)                                      |
-| ~SPC t E h~ | =Ⓔh=    | Eh    | hybrid editing style (hybrid mode)                                   |
-| ~SPC t f~   | =ⓕ=     | f     | fill-column-indicator mode                                           |
-| ~SPC t F~   | =Ⓕ=     | F     | auto-fill mode                                                       |
-| ~SPC t G~   | =Ⓖ=     | G     | [[http://spacemacs.org/layers/+tags/gtags/README.html][ggtags]] mode                                                          |
-| ~SPC t g~   | =ⓖ=     | g     | [[https://github.com/roman/golden-ratio.el][golden-ratio]] mode                                                    |
-| ~SPC t h i~ | =ⓗi=    | hi    | toggle highlight indentation levels                                  |
-| ~SPC t h c~ | =ⓗc=    | hc    | toggle highlight indentation current column                          |
-| ~SPC t i~   | =ⓘ=     | i     | indentation guide                                                    |
-| ~SPC t C-i~ | =ⓘ=     | i     | global indentation guide                                             |
-| ~SPC t I~   | =Ⓘ=     | I     | aggressive indent mode                                               |
-| ~SPC t K~   | =Ⓚ=     | K     | which-key mode                                                       |
-| ~SPC t p~   | =ⓟ=     | p     | [[https://github.com/Fuco1/smartparens][smartparens]] mode                                                     |
-| ~SPC t C-p~ | =ⓟ=     | p     | global smartparens                                                   |
-| ~SPC t s~   | =ⓢ=     | s     | syntax checking (flycheck)                                           |
-| ~SPC t S~   | =Ⓢ=     | S     | enabled in [[https://github.com/syl20bnr/spacemacs/blob/develop/layers/%2Bcheckers/spell-checking/README.org][spell checking layer]] (flyspell)                           |
-| ~SPC t w~   | =ⓦ=     | w     | whitespace mode                                                      |
-| ~SPC t C-w~ | =ⓦ=     | w     | global whitespace                                                    |
-| ~SPC t W~   | =Ⓦ=     | W     | automatic whitespace cleanup (see =dotspacemacs-whitespace-cleanup=) |
-| ~SPC t C-W~ | =Ⓦ=     | W     | automatic whitespace cleanup globally                                |
-| ~SPC t y~   | =ⓨ=     | y     | [[https://github.com/capitaomorte/yasnippet][yasnippet]] mode                                                       |
+| Key binding   | Unicode | ASCII | Mode                                                                 |
+|---------------+---------+-------+----------------------------------------------------------------------|
+| ~SPC t -~     | =⊝=     | -     | [[https://www.emacswiki.org/emacs/centered-cursor-mode.el][centered-cursor]] mode                                                 |
+| ~SPC t 8~     | =⑧=     | 8     | toggle highlight of characters for long lines                        |
+| ~SPC t C-8~   | =⑧=     | 8     | global toggle highlight of characters for long lines                 |
+| ~SPC t C--~   | =⊝=     | -     | global centered cursor                                               |
+| ~SPC t a~     | =ⓐ=     | a     | auto-completion                                                      |
+| ~SPC t c~     | =ⓒ=     | c     | camel case motion with subword mode                                  |
+| =none=        | =ⓔ=     | e     | [[https://github.com/Somelauw/evil-org-mode][evil-org]] mode                                                        |
+| ~SPC t E e~   | =Ⓔe=    | Ee    | emacs editing style (holy mode)                                      |
+| ~SPC t E h~   | =Ⓔh=    | Eh    | hybrid editing style (hybrid mode)                                   |
+| ~SPC t f~     | =ⓕ=     | f     | fill-column-indicator mode                                           |
+| ~SPC t F~     | =Ⓕ=     | F     | auto-fill mode                                                       |
+| ~SPC t G~     | =Ⓖ=     | G     | [[http://spacemacs.org/layers/+tags/gtags/README.html][ggtags]] mode                                                          |
+| ~SPC t g~     | =ⓖ=     | g     | [[https://github.com/roman/golden-ratio.el][golden-ratio]] mode                                                    |
+| ~SPC t h i~   | =ⓗi=    | hi    | toggle highlight indentation levels                                  |
+| ~SPC t h c~   | =ⓗc=    | hc    | toggle highlight indentation current column                          |
+| ~SPC t i~     | =ⓘ=     | i     | indentation guide                                                    |
+| ~SPC t C-i~   | =ⓘ=     | i     | global indentation guide                                             |
+| ~SPC t I~     | =Ⓘ=     | I     | aggressive indent mode                                               |
+| ~SPC t K~     | =Ⓚ=     | K     | which-key mode                                                       |
+| ~SPC t L~     | =Ⓛ=     | L     | visual line navigation                                               |
+| ~SPC t C-S-l~ | =Ⓛ=     | L     | visual line navigation globally                                      |
+| ~SPC t p~     | =ⓟ=     | p     | [[https://github.com/Fuco1/smartparens][smartparens]] mode                                                     |
+| ~SPC t C-p~   | =ⓟ=     | p     | global smartparens                                                   |
+| ~SPC t s~     | =ⓢ=     | s     | syntax checking (flycheck)                                           |
+| ~SPC t S~     | =Ⓢ=     | S     | enabled in [[https://github.com/syl20bnr/spacemacs/blob/develop/layers/%2Bcheckers/spell-checking/README.org][spell checking layer]] (flyspell)                           |
+| ~SPC t w~     | =ⓦ=     | w     | whitespace mode                                                      |
+| ~SPC t C-w~   | =ⓦ=     | w     | global whitespace                                                    |
+| ~SPC t W~     | =Ⓦ=     | W     | automatic whitespace cleanup (see =dotspacemacs-whitespace-cleanup=) |
+| ~SPC t C-W~   | =Ⓦ=     | W     | automatic whitespace cleanup globally                                |
+| ~SPC t y~     | =ⓨ=     | y     | [[https://github.com/capitaomorte/yasnippet][yasnippet]] mode                                                       |
 
 ** Frame
 *** Title
@@ -1749,9 +1757,54 @@ Press ~?~ to toggle the full help.
 | ~x~                 | kill current layout with its buffers                       |
 | ~X~                 | kill other layouts with their buffers                      |
 
+*** Behavior of SPC TAB with layouts
+By default ~SPC TAB~ which switches to last opened buffer is restricted to the
+current layout. If there is only one opened buffer for a given layout then
+~SPC TAB~ won't do anything and the following message is displayed in the
+minibuffer:
+
+#+BEGIN_QUOTE
+  Last buffer not found.
+#+END_QUOTE
+
+To allow ~SPC TAB~ to switch to the last opened buffer from another layout set
+this variable =spacemacs-layouts-restrict-spc-tab= to =nil=. For instance in
+your used layer list with layer variables:
+
+#+BEGIN_EXAMPLE
+  (spacemacs-layouts :variables spacemacs-layouts-restrict-spc-tab t)
+#+END_EXAMPLE
+
+*** Restrict a given function to the current layout
+You can make any function "layout aware" by adding it to the list
+=spacemacs-layouts-restricted-functions=. It is not possible to change this
+variable when Emacs is running. You have to define it using layer variables.
+If you change this variable then Emacs must be restarted for the change to
+take effect.
+
+Default value for this variable is:
+
+#+BEGIN_EXAMPLE
+  '(spacemacs/window-split-double-columns
+    spacemacs/window-split-triple-columns
+    spacemacs/window-split-grid)
+#+END_EXAMPLE
+
+If you want to add the function =my-func= to this list you need to redefine
+the complete list using layer variables:
+
+#+BEGIN_EXAMPLE
+  (spacemacs-layouts :variables
+                     spacemacs-layouts-restricted-functions
+                     '(spacemacs/window-split-double-columns
+                       spacemacs/window-split-triple-columns
+                       spacemacs/window-split-grid
+                       my-func))
+#+END_EXAMPLE
+
 ** Workspaces
 Workspaces are sub-layouts, they allow to define multiple layouts into a given
-layout, those layouts share the same buffer as the parent layout.
+layout, those layouts share the same buffers as the parent layout.
 
 The currently active workspace number is displayed before the window number,
 for instance "➊|➍" or "1|4" means the fourth window of the first workspace.
@@ -2165,6 +2218,7 @@ The ~SPC j~ prefix is for jumping, joining and splitting.
 | ~SPC j l~   | jump to a line with avy (works as an evil motion)                                 |
 | ~SPC j q~   | show the dumb-jump quick look tooltip                                             |
 | ~SPC j u~   | jump to a URL in the current buffer                                               |
+| ~SPC j U~   | select a URL in the current buffer and follow it                                  |
 | ~SPC j v~   | jump to the definition/declaration of an Emacs Lisp variable                      |
 | ~SPC j w~   | jump to a word in the current buffer (works as an evil motion)                    |
 
@@ -2178,6 +2232,8 @@ The ~SPC j~ prefix is for jumping, joining and splitting.
 | ~SPC j o~   | split the current line at point but let point on current line            |
 | ~SPC j s~   | split a quoted string or s-expression in place                           |
 | ~SPC j S~   | split a quoted string or s-expression, insert a new line and auto-indent |
+| ~SPC j =~   | format the marked region or entire buffer                                |
+| ~SPC j +~   | format the marked region or entire buffer also cleanup whitespace        |
 
 *** Window manipulation
 **** Window manipulation key bindings
@@ -3232,7 +3288,7 @@ The key bindings start with ~SPC x r~ and have the following mnemonic structure:
 *** Deleting files
 Deletion is configured to send deleted files to system trash.
 
-On OS X the =trash= program is required. It can be installed with [[https://brew.sh/][homebrew]] with
+On macOS the =trash= program is required. It can be installed with [[https://brew.sh/][homebrew]] with
 the following command:
 
 #+BEGIN_SRC sh
@@ -3466,15 +3522,15 @@ You can open a file in Emacs from the terminal using =emacsclient=. Use
 file in Emacs within the terminal. If you set Emacs server socket by setting =dotspacemacs-server-socket-dir=,
 then pass its location as =-s ~/.emacs.d/server/server= additionally.
 
-If you want your Linux/OS X system to use Emacs by default for any prompt, you
-need to set it in your shell configuration, e.g. =~/.bashrc= or =~/.zshrc=:
+If you want your Linux or macOS system to use Emacs by default for any prompt,
+you need to set it in your shell configuration, e.g. =~/.bashrc= or =~/.zshrc=:
 
 #+BEGIN_SRC sh-mode
   export EDITOR="emacsclient -c"
 #+END_SRC
 
-Note that if you're on OS X, you may have to refer to the emacsclient that comes
-with your GUI Emacs, e.g.:
+Note that if you're using macOS, you may have to refer to the emacsclient that
+comes with your GUI Emacs, e.g.:
 
 #+BEGIN_SRC sh-mode
   export EDITOR="/Applications/Emacs.app/Contents/MacOS/bin/emacsclient -c"
@@ -3531,6 +3587,70 @@ usable; if it is not then restart Emacs with =emacs --debug-init= and open a
 To ensure that packages are correctly compiled for the new Emacs version you
 installed, be sure to run the interactive command =spacemacs/recompile-elpa=
 with ~SPC u SPC SPC spacemacs/recompile-elpa~.
+
+** General layer errors
+It happens from time to time that some of the layers go stale and stop
+working properly for some commands. If this happens stay calm and try
+to produce a minimal bug report on the [[https://github.com/syl20bnr/spacemacs/issues][Github issue page]].
+
+*** Step by step instructions for minimal layer bug reports
+- Load the standard dotfile. You can get it with ~SPC f e D~.
+- Add the malfunctioning layer.
+- Use ~SPC t D~ to enable debug on error, this will
+  produce a backtrace when encountering a lisp error.
+- Reproduce the error. Note down the steps and backtrace.
+- Press ~SPC h I~ and fill in the place holders
+  enclosed in ~<<~ and ~>>~ signs. Don't forget the
+  reproduction guide and backtrace.
+- Press ~C-c C-c~ or ~, ,~ to transfer your buffers
+  content to the github issue creation page.
+- Enter a meaningfull title for your issue, stating
+  in short words what the issue is.
+- When everything has been filled in submit the bug
+  report.
+- When someone answers to your issue or ask questions
+  it goes without saying that you should answer him
+  politely and assist in testing a possible fix.
+
+** General emacs package errors
+It can also happen that your issue is not related to any layer but
+rather to a specific package in the emacs universe. In this case
+you should provide a minimalistic emacs only reproduction guide for the
+respective package and open an issue upstream. If there is already
+a spacemacs issue for your problem your upstream bug report should
+mention its ticket number so it is clear when this issue can be
+retested.
+
+*** Step by step instructions for minimal emacs package bug reports
+- Start emacs with ~emacs -q~, this will load a vanilla
+  emacs without any non-system packages loaded.
+- There open a scratch buffer with ~C-x b *scratch* RET~
+- Add initialization code for your package there
+
+  #+BEGIN_SRC elisp
+    ;; Load the package
+    (require 'package)
+
+    ;; Mention all packages you wish to have loaded
+    (setq package-load-list
+          '((package1 t)
+            (package2 t)
+            (package3 t)))
+
+    ;; Do package specific configuration if required
+    ;; (package-local-init)
+
+    ;; Intialize your package list
+    (package-initialize)
+  #+END_SRC
+
+- Now press ~M-x eval-buffer~ to evaluate the code.
+- Reproduce your issue. Note down step by step instructions.
+- With this information open an upstream issue following
+  their issue templates. If they have non its a good idea
+  to start with the infos required in the spacemacs issue
+  template and add missing information when required from
+  the package maintainers.
 
 * Achievements
 ** Issues
